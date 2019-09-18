@@ -24,10 +24,59 @@ public class TicketMachineTest {
 
 	@Test
 	// S2 : la balance change quand on insère de l’argent
-	public void insertMoneyChangesBalance() {
+	public void insertMoneyChangesBalance() throws Exception {
 		machine.insertMoney(10);
 		machine.insertMoney(20);
 		assertEquals("La balance n'est pas correctement mise à jour", 10 + 20, machine.getBalance()); // Les montants ont été correctement additionnés               
 	}
+        
+        @Test
+        public void ticketNotPrinted() throws Exception{
+            this.machine.insertMoney(20);
+            assertFalse(machine.printTicket());
+        }
+        
+        @Test
+        public void tickedIsPrinted() throws Exception{
+            this.machine.insertMoney(PRICE);
+            assertTrue(machine.printTicket());
+        }
+        
+        @Test
+        public void balanceIsReduced() throws Exception{
+            this.machine.insertMoney(PRICE);
+            this.machine.printTicket();
+            assertEquals(0,this.machine.getBalance());
+        }
+        
+        @Test
+        public void totalIsUpdated() throws Exception{
+            this.machine.insertMoney(PRICE);
+            this.machine.printTicket();
+            assertEquals(PRICE,this.machine.getTotal());
+        }
+        
+        @Test
+        public void refundGiveRightAmount() throws Exception{
+            this.machine.insertMoney(40);
+            assertEquals(machine.refund(), 40);
+        }
+        
+        @Test
+        public void balanceAtZeroAfterRefund() throws Exception{
+            this.machine.insertMoney(20);
+            this.machine.refund();
+            assertEquals(this.machine.getBalance(),0);
+        }
+        
+        @Test(expected = Exception.class)
+        public void cannotInsereNegativeAmount() throws Exception{
+            this.machine.insertMoney(-20);
+        }
+        
+        @Test(expected = IllegalArgumentException.class)
+        public void priceNotNegative(){
+            TicketMachine tick = new TicketMachine(-PRICE);
+        }
 
 }
